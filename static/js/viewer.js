@@ -174,7 +174,7 @@ $("#btnService").click(function(){
     console.log("Location : ", $("#location-service").val())
     console.log("Size : ", $("input[name=size]:checked")[0].value)
     
-    let fetch_url = "http://127.0.0.1:5000/service/" +
+    let fetch_url = "http://127.0.0.1:5000/api/service/" +
         $("#location-service").val() + "," + $("input[name=size]:checked")[0].value
     console.log("Service url : ", fetch_url)
 
@@ -224,7 +224,7 @@ $("#btnSearch").click(function(){
     console.log(distanceRange)
     console.log(location)
 
-    let fetch_url = "http://127.0.0.1:5000/search/" + location + "," + distanceRange
+    let fetch_url = "http://127.0.0.1:5000/api/search/" + location + "," + distanceRange
     console.log("Service url : ", fetch_url)
 
     $.ajax({
@@ -292,7 +292,7 @@ $("#btnClosest").click(() => {
     removeLayerByName(mainMap, "closest");
 
     let location = $('#closest-location').val()
-    let fetch_url = "http://127.0.0.1:5000/closest/" + location
+    let fetch_url = "http://127.0.0.1:5000/api/closest/" + location
 
     $.ajax({
         url: fetch_url,

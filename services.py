@@ -1,1 +1,0 @@
-SERVICES_ABS_PATH = "C:/Users/Mamadou/Desktop/GeoWebApp/app/services"
