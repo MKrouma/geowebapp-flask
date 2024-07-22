@@ -35,7 +35,6 @@ def internal_server_error(e):
     return render_template('500.html'), 500
 
 # api routes
-
 @app.route('/api/markets', methods=['GET'])
 def get_markets():
     
@@ -44,7 +43,6 @@ def get_markets():
 
     # inputs
     crs = 3857
-    id = 1
 
     # request from geodatabase
     select_query = text(f"""

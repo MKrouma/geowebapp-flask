@@ -1,5 +1,5 @@
 # activate venv
-.\venv\Scripts\activate
+source ./venv/bin/activate
 
 #this is our main entry
 set FLASK_APP=app.py
