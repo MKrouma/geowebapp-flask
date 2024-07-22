@@ -157,7 +157,6 @@ $("input[name=basemap]").click(function(evt){
     removeLayerByName(mainMap, "base");
     let baseLayer = getBaseMap(evt.target.value);
     mainMap.addLayer(baseLayer);    
-    console.log("Hello world!");
 })
 
 $("#pnl-service").click(function(evt){
