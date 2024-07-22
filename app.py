@@ -14,7 +14,14 @@ CORS(app)
 
 # settings
 load_dotenv()
-db_url = os.getenv('DB_URL')
+db_prod = True
+if db_prod : 
+    db_url = os.getenv('DB_NEON_URL')
+    db_schema = "public"
+else : 
+    db_url = os.getenv('DB_URL')
+    db_schema = "data"
+# print("DB URL : ", db_url)
 engine = create_engine(db_url)
 
 # page routes
@@ -47,7 +54,7 @@ def get_markets():
     # request from geodatabase
     select_query = text(f"""
     SELECT gid, name, CAST(pop_2020 AS float) as population, categorie, ST_AsText(ST_Transform(geom, {crs})) as geometry
-    FROM data.bi_markets""")
+    FROM {db_schema}.bi_markets""")
 
     result = connection.execute(select_query)
 
@@ -78,7 +85,7 @@ def get_market(market_id):
     # request from geodatabase
     select_query = text(f"""
     SELECT gid, name, CAST(pop_2020 AS float) as population, categorie, ST_AsText(ST_Transform(geom, {crs})) as geometry
-    FROM data.bi_markets WHERE gid={market_id}""")
+    FROM {db_schema}.bi_markets WHERE gid={market_id}""")
 
     result = connection.execute(select_query)
     row = result.fetchone()
@@ -107,7 +114,7 @@ def get_service_area(params) :
     select_query = text(
         f"""
             SELECT name, ST_AsGeojson(ST_Transform(geom, {crs_map})) as geometry
-            FROM data.bi_{size} as a
+            FROM {db_schema}.bi_{size} as a
             WHERE ST_Intersects(a.geom, ST_Transform(ST_GeomFromText('Point({lat} {lon})', {crs_map}), {crs_db}))
         """
     )
@@ -139,7 +146,7 @@ def get_search_markets(params) :
     select_query = text(
         f"""
             SELECT name, CAST(pop_2020 AS float) as population, ST_AsGeojson(ST_Transform(geom, {crs_map})) as geometry
-            FROM data.bi_markets as bm
+            FROM {db_schema}.bi_markets as bm
             WHERE ST_DWithin(ST_GeomFromText('Point({lon} {lat})', {crs_map}), ST_Transform(bm.geom, {crs_map}), {distance_range_km})
         """
     )
@@ -178,7 +185,7 @@ def get_closest_markets(params) :
         select_query = text(
             f"""
                 SELECT gid as id, name, categorie, ST_Distance(ST_Transform(geom, {crs_map}), ST_GeomFromText('POINT({coord})', {crs_map})) AS distance, ST_AsGeojson(ST_Transform(geom, {crs_map})) as geometry
-                FROM data.bi_markets
+                FROM {db_schema}.bi_markets
                 WHERE categorie='{market}'
                 ORDER BY distance
                 LIMIT 1;
