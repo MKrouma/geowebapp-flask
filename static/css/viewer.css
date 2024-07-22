@@ -1,0 +1,78 @@
+.nav-item a:hover {
+    background-color: rgb(107, 168, 67);
+    color: white;
+}
+
+
+#map {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+
+.panel {
+    display: block;
+    position: absolute;
+    height: auto;
+    z-index: 100;
+}
+
+.panel-tool {
+    width: 350px;
+    right: 5px;
+    top: 70px;
+}
+
+.panel-tool input[type=button] {
+    background-color: rgb(107, 168, 67);
+    color: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.panel-info {
+    max-width: 450px;
+    bottom: 50px;
+}
+
+#pnl-about {
+    left: 30%;
+}
+
+#pnl-contact {
+    left: 50%;
+}
+ 
+.panel .card-header {
+    background-color: rgb(107, 168, 67);
+    color: white;
+}
+
+.form-distance-range{
+    height: 5px;
+    background-color: #EAECEF;
+    margin-top: 5px;
+}
+ 
+.close-icon {
+    cursor: pointer;
+}
+
+
+footer {
+    padding: 0px;
+}
+ 
+footer a {
+    text-decoration: none;
+    color: rgb(94, 94, 94);
+    padding: 5px 20px;
+}
+ 
+footer a:hover {
+    background-color: rgb(107, 168, 67);
+    color: white;
+}
