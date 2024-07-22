@@ -130,7 +130,7 @@ def get_service_area(params) :
 def get_search_markets(params) :
 
     # inputs data
-    lat, lon, distance_range = params.split(',')
+    lon, lat, distance_range = params.split(',')
     distance_range_km = int(distance_range)*1000
     crs_map, crs_db = 3857, 4326
 
@@ -140,7 +140,7 @@ def get_search_markets(params) :
         f"""
             SELECT name, CAST(pop_2020 AS float) as population, ST_AsGeojson(ST_Transform(geom, {crs_map})) as geometry
             FROM data.bi_markets as bm
-            WHERE ST_DWithin(ST_GeomFromText('Point(3333715.2669 -367277.1132)', {crs_map}), ST_Transform(bm.geom, {crs_map}), {distance_range_km})
+            WHERE ST_DWithin(ST_GeomFromText('Point({lon} {lat})', {crs_map}), ST_Transform(bm.geom, {crs_map}), {distance_range_km})
         """
     )
     result = connection.execute(select_query)
