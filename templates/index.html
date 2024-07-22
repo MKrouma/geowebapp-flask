@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burundi | Market Analytics</title>
+    <link rel="icon" href="../static/img/favicon.png" type="image/png">
+    {% block styles %}
+        {{ bootstrap.load_css() }}
+    {% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <div id="index-bg">
+        <div id="index-overlay">
+            <main class="d-flex h-100 w-100 justify-content-center align-items-center">
+                <div id="index-info">
+                    <h1><strong>Burundi</strong> | Market Analytics</h1>
+        
+                    <h2>
+                        Designed and developed for the MOOC:<br/>
+                        <strong>Geo web app building with open-source GIS tools </strong>
+                    </h2>
+
+                    <a href="{{ url_for('viewer') }}">
+                        <span>Open app</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/mamadou-krouma-geospatial-geomatique/" target=”_blank”>
+                        <span>My linkedin</span>
+                    </a>                          
+                </div>
+            </main>
+        </div>
+    </div>
+
+    {% block scripts %}
+        {{ bootstrap.load_js() }}
+    {% endblock %}
+</body>
+</html>
