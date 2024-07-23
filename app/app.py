@@ -7,21 +7,20 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from flask import Flask, jsonify, abort, render_template
 from sqlalchemy import create_engine, text
+from config import config
 
 # app initialization
 app = Flask(__name__)
+app_config = config['development']
+app.config.from_object(app_config)
+app_config.init_app(app)
 CORS(app)
 
 # settings
-load_dotenv()
-db_prod = True
-if db_prod : 
-    db_url = os.getenv('DB_NEON_URL')
-    db_schema = "public"
-else : 
-    db_url = os.getenv('DB_URL')
-    db_schema = "data"
-# print("DB URL : ", db_url)
+db_url = app_config.DATABASE_URI
+db_schema = app_config.DB_SCHEMA
+
+print("db_url : ", db_url)
 engine = create_engine(db_url)
 
 # page routes
