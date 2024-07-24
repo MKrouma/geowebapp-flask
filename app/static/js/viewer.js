@@ -175,7 +175,7 @@ $("#btnService").click(function(){
     
     let fetch_url = "http://127.0.0.1:10000/api/service/" +
         $("#location-service").val() + "," + $("input[name=size]:checked")[0].value
-    console.log("Service url : ", fetch_url)
+    // console.log("Service url : ", fetch_url)
 
     $.ajax({
         url: fetch_url,
@@ -224,7 +224,7 @@ $("#btnSearch").click(function(){
     console.log(location)
 
     let fetch_url = "http://127.0.0.1:10000/api/search/" + location + "," + distanceRange
-    console.log("Service url : ", fetch_url)
+    // console.log("Service url : ", fetch_url)
 
     $.ajax({
         url: fetch_url,
