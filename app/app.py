@@ -11,7 +11,7 @@ from config import config
 
 # app initialization
 app = Flask(__name__)
-app_config = config['development']
+app_config = config['production']
 app.config.from_object(app_config)
 app_config.init_app(app)
 CORS(app)
