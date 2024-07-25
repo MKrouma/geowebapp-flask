@@ -32,6 +32,8 @@ if __name__ == "__main__" :
     app_config = config['development'] 
     db_url = app_config.DATABASE_URI
     db_schema = app_config.DB_SCHEMA
+    secret = app_config.SECRET_KEY
 
     print("DB URL : ", db_url)
     print("DB SCHEMA : ", db_schema)
+    print("Secret KEY : ", secret)

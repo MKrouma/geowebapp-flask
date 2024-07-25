@@ -24,19 +24,21 @@ def read_from_db(query, log=False):
     # connection
     connection = get_db_connection()
 
-    # read from db
-    result = connection.execute(query)
+    try : 
+        # read from db
+        result = connection.execute(query)
 
-    # dict result
-    result_dict = []
-    for row in result :
-        # print(dict(row._asdict()))
-        result_dict.append(dict(row._asdict()))
+        # dict result
+        result_dict = []
+        for row in result :
+            # print(dict(row._asdict()))
+            result_dict.append(dict(row._asdict()))
 
+    except Exception as e:
+        return [{"error" : str(e)}]
+    
     connection.close()
 
-    # result
-    # result_json = json.dumps(result_dict)
 
     if log : 
         print("Connection : ", connection)
@@ -52,17 +54,17 @@ def write_to_db(query, log=False):
     try : 
         # write to db
         result = connection.execute(query)
-        connection.close()
-    except :
-        return "Error for writing to db"
+    
+    except Exception as e:
+        return [{"error" : str(e)}]
+    
+    connection.close()
 
 
 if __name__ == "__main__" :
 
     # test connexion
     connection = get_db_connection()
-
-    # test read_db
     query = text(f"""
                 SELECT gid, name, CAST(pop_2020 AS float) as population
                 FROM {db_schema}.bi_markets""")

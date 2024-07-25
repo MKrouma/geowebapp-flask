@@ -13,6 +13,7 @@ from db import read_from_db
 
 # app initialization
 app = Flask(__name__)
+app.config.from_object(config[mode])
 CORS(app)
 
 # settings
