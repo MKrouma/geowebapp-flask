@@ -1,42 +1,70 @@
 import os
-import geopandas as gpd
+import json
+from config import config
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from geoalchemy2 import Geometry, WKTElement
+from sqlalchemy import create_engine, text
+from settings import mode
+
 
 # Database connection parameters
 load_dotenv()
-neon_host = os.getenv('NEON_HOST')
-neon_username = os.getenv('NEON_USERNAME')
-neon_password = os.getenv('NEON_PASSWORD')
-neon_dbname = os.getenv('NEON_DATABASE')
+app_config = config[mode]
+db_url = app_config.DATABASE_URI
+db_schema = app_config.DB_SCHEMA
 
-# Shapefile path
-shapefile_path_list = [
-    "./data/bi_capital_areas.shp"
-]
-shapefile_path = shapefile_path_list[0]
-table_name = shapefile_path.split("/")[-1].split(".")[0]
-schema_name = "data"
-full_table_name = f"{schema_name}.{table_name}"
+# create db engine
+engine = create_engine(db_url)
 
-# Create a connection string
-connection_string = f"postgresql+psycopg2://{neon_username}:{neon_password}@{neon_host}/{neon_dbname}?sslmode=require"
+def get_db_connection():
+    # create connection
+    connection = engine.connect()
+    return connection
 
-# Create a SQLAlchemy engine
-engine = create_engine(connection_string)
+def read_from_db(query, log=False):
+    # connection
+    connection = get_db_connection()
 
-# Read the shapefile using geopandas
-gdf = gpd.read_file(shapefile_path)
+    # read from db
+    result = connection.execute(query)
 
-# Convert the geometries to WKT format
-gdf['geom'] = gdf['geometry'].apply(lambda geom: WKTElement(geom.wkt, srid=4326))
-gdf = gdf.drop('geometry', axis=1)
+    # dict result
+    result_dict = []
+    for row in result :
+        # print(dict(row._asdict()))
+        result_dict.append(dict(row._asdict()))
 
-print("Geodatabase", gdf)
+    connection.close()
 
-# Define the table schema
-gdf.to_sql(table_name, engine, if_exists='replace', index=False, 
-           dtype={'geom': Geometry('POLYGON', srid=4326)})
+    # result
+    # result_json = json.dumps(result_dict)
 
-print("Shapefile data has been successfully inserted into the database.")
+    if log : 
+        print("Connection : ", connection)
+        print("Result dict : ", result_dict)
+        print("Read from db : ", result_json)
+
+    return result_dict
+
+def write_to_db(query, log=False):
+    # connection
+    connection = get_db_connection()
+
+    try : 
+        # write to db
+        result = connection.execute(query)
+        connection.close()
+    except :
+        return "Error for writing to db"
+
+
+if __name__ == "__main__" :
+
+    # test connexion
+    connection = get_db_connection()
+
+    # test read_db
+    query = text(f"""
+                SELECT gid, name, CAST(pop_2020 AS float) as population
+                FROM {db_schema}.bi_markets""")
+    result_json = read_from_db(query, log=True)
+    

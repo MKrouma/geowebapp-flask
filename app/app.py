@@ -8,20 +8,15 @@ from flask_cors import CORS
 from flask import Flask, jsonify, abort, render_template
 from sqlalchemy import create_engine, text
 from config import config
+from settings import mode
+from db import read_from_db
 
 # app initialization
 app = Flask(__name__)
-app_config = config['production']
-app.config.from_object(app_config)
-app_config.init_app(app)
 CORS(app)
 
 # settings
-db_url = app_config.DATABASE_URI
-db_schema = app_config.DB_SCHEMA
-
-print("db_url : ", db_url)
-engine = create_engine(db_url)
+db_schema = config[mode].DB_SCHEMA
 
 # page routes
 @app.route('/')
@@ -43,11 +38,8 @@ def internal_server_error(e):
 # api routes
 @app.route('/api/markets', methods=['GET'])
 def get_markets():
-    
-    # create connection
-    connection = engine.connect()
 
-    # inputs
+    # params
     crs = 3857
 
     # request from geodatabase
@@ -55,30 +47,15 @@ def get_markets():
     SELECT gid, name, CAST(pop_2020 AS float) as population, categorie, ST_AsText(ST_Transform(geom, {crs})) as geometry
     FROM {db_schema}.bi_markets""")
 
-    result = connection.execute(select_query)
-
-    # dict result
-    result_dict = []
-    for row in result :
-        # print(dict(row._asdict()))
-        result_dict.append(dict(row._asdict()))
-
-    connection.close()
-
     # json result
-    result_json = json.dumps(result_dict)
+    result_json = jsonify(read_from_db(select_query))
 
     return result_json
 
 @app.route('/api/market/<int:market_id>', methods=['GET'])
 def get_market(market_id):
 
-    # market_id = int(market_id)
-    
-    # create connection
-    connection = engine.connect()
-
-    # inputs
+    # params
     crs = 3857
 
     # request from geodatabase
@@ -86,17 +63,8 @@ def get_market(market_id):
     SELECT gid, name, CAST(pop_2020 AS float) as population, categorie, ST_AsText(ST_Transform(geom, {crs})) as geometry
     FROM {db_schema}.bi_markets WHERE gid={market_id}""")
 
-    result = connection.execute(select_query)
-    row = result.fetchone()
-
-    # wrong id
-    if row is None:
-        abort(404)  # Not Found
-
-    connection.close()
-
     # json result
-    result_json = jsonify(dict(row._mapping))
+    result_json = jsonify(read_from_db(select_query))
 
     return result_json
 
@@ -109,7 +77,6 @@ def get_service_area(params) :
     crs_db = 4326
 
     # connect to geodatabase
-    connection = engine.connect()
     select_query = text(
         f"""
             SELECT name, ST_AsGeojson(ST_Transform(geom, {crs_map})) as geometry
@@ -117,18 +84,8 @@ def get_service_area(params) :
             WHERE ST_Intersects(a.geom, ST_Transform(ST_GeomFromText('Point({lat} {lon})', {crs_map}), {crs_db}))
         """
     )
-    result = connection.execute(select_query)
-
-    # dict result
-    result_dict = []
-    for row in result :
-        # print(dict(row._asdict()))
-        result_dict.append(dict(row._asdict()))
-
-    connection.close()
-
     # json result
-    service_area = jsonify(result_dict)
+    service_area = jsonify(read_from_db(select_query))
 
     return service_area
 
@@ -141,7 +98,6 @@ def get_search_markets(params) :
     crs_map, crs_db = 3857, 4326
 
     # connect to geodatabase
-    connection = engine.connect()
     select_query = text(
         f"""
             SELECT name, CAST(pop_2020 AS float) as population, ST_AsGeojson(ST_Transform(geom, {crs_map})) as geometry
@@ -149,18 +105,9 @@ def get_search_markets(params) :
             WHERE ST_DWithin(ST_GeomFromText('Point({lon} {lat})', {crs_map}), ST_Transform(bm.geom, {crs_map}), {distance_range_km})
         """
     )
-    result = connection.execute(select_query)
-
-    # dict result
-    result_dict = []
-    for row in result :
-        # print(dict(row._asdict()))
-        result_dict.append(dict(row._asdict()))
-
-    connection.close()
-
+    
     # json result
-    search_market = jsonify(result_dict)
+    search_market = jsonify(read_from_db(select_query))
 
     return search_market
 
@@ -175,9 +122,6 @@ def get_closest_markets(params) :
         "capital_markets", "local_markets", "medium_markets", "small_markets"
     ]
 
-    # connection
-    connection = engine.connect()
-
     # request closest market by size
     result_dict = []
     for market in market_type : 
@@ -191,15 +135,8 @@ def get_closest_markets(params) :
             """
         )
 
-        result = connection.execute(select_query)
-
-        for row in result :
-            result_dict.append(dict(row._asdict()))
-
-    connection.close()
-
-    print(result_dict)
-    print(len(result_dict))
+        result = read_from_db(select_query)[0]
+        result_dict.append(result)
 
     # closest markets
     closest_markets = jsonify(result_dict)
